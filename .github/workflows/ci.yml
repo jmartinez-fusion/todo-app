@@ -19,8 +19,8 @@ jobs:
           --health-cmd="curl --fail http://localhost:9000/api/system/health || exit 1"
           --health-interval=30s
           --health-timeout=10s
-          --health-retries=40  # Incrementa el número de reintentos
-          --memory="4g"  # Aumenta la memoria del contenedor
+          --health-retries=40
+          --memory="4g"
 
     steps:
     - name: Checkout code
