@@ -10,18 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      sonarqube:
-        image: sonarqube
-        ports:
-          - 9000:9000
-        options: >-
-          --health-cmd="curl --fail http://localhost:9000/api/system/health || exit 1"
-          --health-interval=30s
-          --health-timeout=10s
-          --health-retries=40
-          --memory="4g"
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -37,25 +25,21 @@ jobs:
     - name: Run tests
       run: npm test
 
-    - name: Wait for SonarQube to be ready
-      run: |
-        echo "Waiting for SonarQube to be ready..."
-        for i in $(seq 1 40); do
-          if curl -s http://localhost:9000/api/system/status | grep -q 'UP'; then
-            echo "SonarQube is up and running"
-            break
-          fi
-          echo "Waiting for SonarQube... Attempt $i/40"
-          sleep 15
-        done
-
-    - name: Run SonarQube scan
+    - name: Analyze with SonarCloud
       env:
-        SONAR_HOST_URL: http://localhost:9000
-        SONAR_LOGIN: ${{ secrets.SONAR_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
-        npm install -g sonar-scanner
-        sonar-scanner
+        npm install -g sonarcloud
+        sonar-scanner \
+          -Dsonar.projectKey=<your_project_key> \
+          -Dsonar.organization=<your_organization_key> \
+          -Dsonar.sources=src \
+          -Dsonar.tests=src/tests \
+          -Dsonar.language=javascript \
+          -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+          -Dsonar.exclusions=**/node_modules/**,**/*.spec.js \
+          -Dsonar.host.url=https://sonarcloud.io
 
     - name: Build project
       run: npm run build
