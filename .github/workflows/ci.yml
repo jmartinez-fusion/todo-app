@@ -27,10 +27,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
-        npm install -g sonarcloud
         sonar-scanner \
-          -Dsonar.projectKey=jmartinez-fusion_todo-app \
-          -Dsonar.organization=jmartinez-fusion \
+          -Dsonar.projectKey=<your_project_key> \
+          -Dsonar.organization=<your_organization_key> \
           -Dsonar.sources=src \
           -Dsonar.tests=src/tests \
           -Dsonar.language=javascript \
