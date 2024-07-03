@@ -32,8 +32,8 @@ jobs:
       run: |
         npm install -g sonarcloud
         sonar-scanner \
-          -Dsonar.projectKey=<your_project_key> \
-          -Dsonar.organization=<your_organization_key> \
+          -Dsonar.projectKey=jmartinez-fusion_todo-app \
+          -Dsonar.organization=jmartinez-fusion \
           -Dsonar.sources=src \
           -Dsonar.tests=src/tests \
           -Dsonar.language=javascript \
