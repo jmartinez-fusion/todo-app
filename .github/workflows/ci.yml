@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 
+          fetch-depth: 0
           
       - name: Analyze with SonarQube
         id: sonar
@@ -31,16 +31,63 @@ jobs:
       - name: "Here is SonarQube Quality Gate Status value.."
         run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
 
-  notify-after-analysis:
+  notify-approval:
     runs-on: ubuntu-latest
     needs: Analysis
     steps:
-      - name: Notify on Google Chat after analysis
+      - name: Notify on Google Chat for approval
         if: always()
         run: |
-          GOOGLE_CHAT_ROOM="xYO8qkAAAAE"
-          MESSAGE="SonarQube analysis completed. Quality Gate status: ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
+          MESSAGE="SonarQube analysis completed. Quality Gate status: ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}. Please approve the deployment."
+          APPROVAL_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           curl -X POST -H 'Content-Type: application/json' \
           -d '{
-            "text": "'"$MESSAGE"'"
+            "cards": [
+              {
+                "header": {
+                  "title": "Deployment Approval Request",
+                  "subtitle": "'"$MESSAGE"'"
+                },
+                "sections": [
+                  {
+                    "widgets": [
+                      {
+                        "buttons": [
+                          {
+                            "textButton": {
+                              "text": "APPROVE DEPLOYMENT",
+                              "onClick": {
+                                "openLink": {
+                                  "url": "'"$APPROVAL_URL"'"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
           }' "${{ secrets.PROAPPROVAL }}"
+
+  approval:
+    runs-on: ubuntu-latest
+    needs: notify-approval
+    steps:
+      - name: Wait for manual approval
+        run: echo "Waiting for manual approval"
+        env:
+          CONTINUE: ${{ github.event.inputs.continue || 'false' }}
+        timeout-minutes: 1440
+        if: ${{ env.CONTINUE != 'true' }}
+        continue-on-error: true
+        
+  deploy:
+    runs-on: ubuntu-latest
+    needs: approval
+    steps:
+      - name: Deploy application
+        run: echo "Deploying the application..."
+        if: ${{ needs.approval.result == 'success' }}
