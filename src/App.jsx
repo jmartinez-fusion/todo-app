@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -6,13 +6,34 @@ import './App.css'
 function App() {
   const [count, setCount] = useState(0)
 
+  // Error: uso incorrecto de useEffect (dependencias faltantes)
+  useEffect(() => {
+    document.title = `Count is ${count}`
+  }, []) // Debería incluir 'count' en las dependencias
+
+  // Error: declaración de variable no utilizada
+  let unusedVariable = 'I am not used anywhere';
+
+  // Error: uso de 'var' en lugar de 'let' o 'const'
+  var someVar = "This should be let or const";
+
+  // Error: función sin uso
+  function unusedFunction() {
+    console.log("This function is never used");
+  }
+
+  // Error: comparación débil (== en lugar de ===)
+  if (count == "5") {
+    console.log("Count is 5");
+  }
+
   return (
     <>
       <div>
-        <a href="https://vitejs.dev" target="_blank">
+        <a href="https://vitejs.dev" target="_blank" rel="noopener noreferrer">
           <img src={viteLogo} className="logo" alt="Vite logo" />
         </a>
-        <a href="https://react.dev" target="_blank">
+        <a href="https://react.dev" target="_blank" rel="noopener noreferrer">
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
