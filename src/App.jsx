@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
 
-  // Error: uso incorrecto de useEffect (dependencias faltantes)
   useEffect(() => {
     document.title = `Count is ${count}`
-  }, [count]) // Debería incluir 'count' en las dependencias
+  }, []) 
 
+  var someVar = "This should be let or const";
 
   return (
     <>
