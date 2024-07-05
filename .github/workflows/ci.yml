@@ -1,60 +1,17 @@
-name: CI
-
+name: SonarQube analysis
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-
+    branches: [ "main" ]
+  workflow_dispatch:
 jobs:
-  build:
+  Analysis:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '16'
-
-    - name: Install dependencies
-      run: npm install
-
-    - name: Install SonarScanner
-      run: |
-        sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 379CE192D401AB61
-        echo "deb https://dl.bintray.com/sonarsource/deb stable main" | sudo tee -a /etc/apt/sources.list.d/sonar.list
-        sudo apt-get update
-        sudo apt-get install -y sonar-scanner
-
-    - name: Analyze with SonarCloud
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: |
-        sonar-scanner \
-          -Dsonar.projectKey=jmartinez-fusion_todo-app \
-          -Dsonar.organization=jmartinez-fusion \
-          -Dsonar.sources=src \
-          -Dsonar.tests=src/tests \
-          -Dsonar.language=javascript \
-          -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-          -Dsonar.exclusions=**/node_modules/**,**/*.spec.js \
-          -Dsonar.host.url=https://sonarcloud.io
-
-    - name: Build project
-      run: npm run build
-
-    - name: Build Docker image
-      run: docker build -t todo-app .
-
-    - name: Log in to DockerHub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_TOKEN }}
-
-    - name: Push Docker image to DockerHub
-      run: docker push todo-app
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
+      - name: Analyze with SonarQube
+        uses: SonarSource/sonarqube-scan-action@v2.0.1
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
