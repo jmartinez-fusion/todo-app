@@ -11,21 +11,8 @@ function App() {
     document.title = `Count is ${count}`
   }, []) // Debería incluir 'count' en las dependencias
 
-  // Error: declaración de variable no utilizada
-  let unusedVariable = 'I am not used anywhere';
-
   // Error: uso de 'var' en lugar de 'let' o 'const'
   var someVar = "This should be let or const";
-
-  // Error: función sin uso
-  function unusedFunction() {
-    console.log("This function is never used");
-  }
-
-  // Error: comparación débil (== en lugar de ===)
-  if (count == "5") {
-    console.log("Count is 5");
-  }
 
   return (
     <>
