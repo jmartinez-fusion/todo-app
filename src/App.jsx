@@ -10,8 +10,6 @@ function App() {
     document.title = `Count is ${count}`
   }, [count]) // Debería incluir 'count' en las dependencias
 
-  // Error: uso de 'var' en lugar de 'let' o 'const'
-  var someVar = "This should be let or const";
 
   return (
     <>
