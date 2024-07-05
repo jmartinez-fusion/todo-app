@@ -13,8 +13,12 @@ jobs:
         with:
           fetch-depth: 0 
           
-      - name: SonarQube Scan
-        uses: sonarsource/sonarqube-scan-action@master
+      - name: Analyze with SonarQube
+        id: sonar
+        uses: SonarSource/sonarqube-scan-action@v2.0.1
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          ONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
+          
+      
