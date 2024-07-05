@@ -19,10 +19,15 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
           
       - name: Quality Gate status
         run: |
-          response=$(curl -s -u ${{ secrets.SONAR_TOKEN }}: ${{ vars.SONAR_HOST_URL }}/api/qualitygates/project_status?projectKey=todo-app
+          echo "Fetching Quality Gate status..."
+          echo "SonarQube Host URL: ${SONAR_HOST_URL}"
+          echo "SonarQube Project Key: ${SONAR_PROJECT_KEY}"
+          response=$(curl -s -u ${SONAR_TOKEN}: ${SONAR_HOST_URL}/api/qualitygates/project_status?projectKey=todo-app)
+          echo "API Response: $response"
           status=$(echo "$response" | jq -r .projectStatus.status)
           if [ "$status" != "OK" ]; then
             echo "Quality Gate failed: $status"
@@ -33,3 +38,4 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
