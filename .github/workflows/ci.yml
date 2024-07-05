@@ -4,9 +4,14 @@ on:
   push:
     branches: [ "main" ]
   workflow_dispatch:
+    inputs:
+      continue:
+        description: 'Approve deployment'
+        required: true
+        default: 'false'
 
 jobs:
-  Analysis:
+  analysis:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,7 +24,13 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
-          
+
+  quality-gate:
+    runs-on: ubuntu-latest
+    needs: analysis
+    outputs:
+      quality-gate-status: ${{ steps.get-quality-gate-status.outputs.quality-gate-status }}
+    steps:
       - name: SonarQube Quality Gate check
         id: sonarqube-quality-gate-check
         uses: sonarsource/sonarqube-quality-gate-action@master
@@ -27,18 +38,19 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
-          
-      - name: "Here is SonarQube Quality Gate Status value.."
+
+      - name: Get SonarQube Quality Gate Status
+        id: get-quality-gate-status
         run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
 
   notify-approval:
     runs-on: ubuntu-latest
-    needs: Analysis
+    needs: quality-gate
     steps:
       - name: Notify on Google Chat for approval
         if: always()
         run: |
-          MESSAGE="SonarQube analysis completed. Quality Gate status: ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}. Please approve the deployment."
+          MESSAGE="SonarQube analysis completed. Quality Gate status: ${{ needs.quality-gate.outputs.quality-gate-status }}. Please approve the deployment."
           APPROVAL_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           curl -X POST -H 'Content-Type: application/json' \
           -d '{
@@ -75,19 +87,14 @@ jobs:
   approval:
     runs-on: ubuntu-latest
     needs: notify-approval
+    if: github.event.inputs.continue == 'true'
     steps:
-      - name: Wait for manual approval
-        run: echo "Waiting for manual approval"
-        env:
-          CONTINUE: ${{ github.event.inputs.continue || 'false' }}
-        timeout-minutes: 1440
-        if: ${{ env.CONTINUE != 'true' }}
-        continue-on-error: true
-        
+      - name: Approval granted
+        run: echo "Deployment approved manually"
+
   deploy:
     runs-on: ubuntu-latest
     needs: approval
     steps:
       - name: Deploy application
         run: echo "Deploying the application..."
-        if: ${{ needs.approval.result == 'success' }}
