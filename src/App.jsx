@@ -15,7 +15,7 @@ function App() {
     <>
       <div>
         <a href="https://vitejs.dev" target="_blank" rel="noopener noreferrer">
-          <img src={viteLogo} className="logo" />
+          <img src={viteLogo} className="logo" alt="logo" />
           {/* Error: Falta la propiedad "alt" en la etiqueta img */}
         </a>
         <a href="https://react.dev" target="_blank" rel="noopener noreferrer">
