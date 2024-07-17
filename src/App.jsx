@@ -11,11 +11,13 @@ function App() {
     // Error: Falta la dependencia "count" en el array de dependencias
   }, []);
 
+  console.log("Componente App renderizado"); // Error: Uso innecesario de console.log
+
   return (
     <>
       <div>
         <a href="https://vitejs.dev" target="_blank" rel="noopener noreferrer">
-          <img src={viteLogo} className="logo" alt="logo" />
+          <img src={viteLogo} className="logo" />
           {/* Error: Falta la propiedad "alt" en la etiqueta img */}
         </a>
         <a href="https://react.dev" target="_blank" rel="noopener noreferrer">
