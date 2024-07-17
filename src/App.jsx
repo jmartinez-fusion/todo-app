@@ -13,6 +13,11 @@ function App() {
 
   console.log("Componente App renderizado"); // Error: Uso innecesario de console.log
 
+  const incrementCount = () => {
+    count += 1; // Error: Modificación directa del estado
+    setCount(count);
+  };
+
   return (
     <>
       <div>
@@ -26,9 +31,7 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
+        <button onClick={incrementCount}>count is {count}</button>
         <p>
           Edit <code>src/App.jsx</code> and save to test HMR
         </p>
